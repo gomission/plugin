@@ -11,54 +11,59 @@ This plugin gives Claude Code a today/week/month execution surface backed by the
 /plugin install mission@gomission
 ```
 
-Two layers, use one or both:
+The plugin wires `gomission` to a local Mission MCP server via `npx -y @gomission/mcp serve`. That's the default because it works out of the box — no auth handshake required.
 
-**Layer 1 — plugin default (auto-installed)**
-The plugin wires `gomission` to the read-only remote MCP at `https://gomission.io/mcp/`. You get status, findings, review, and doctor visibility immediately. No local process. Safe default. `/mission run` will refuse because dispatch is not exposed on the remote surface.
+**Optional: opt into wrap enforcement**
 
-**Layer 2 — local enforcement (opt-in)**
+If you also have other consequential MCP servers (Gmail, Slack, etc.), run:
+
 ```
-/mission install --wrap   # or --local
+/mission:install --wrap
 ```
-Adds a local Mission server to your user Claude config with the Trust Graduation approval ceremony and `mco_run` dispatch. Restart Claude Code after.
 
-If you install both layers, you'll see duplicate tools — remove one entry. `/mission doctor` will flag this.
+This uses `@gomission/mcp install-claude --wrap` to intercept those MCPs at your user-config layer with an approval ceremony.
+
+**Optional: use the hosted remote MCP**
+
+The hosted MCP at `https://gomission.io/mcp/` requires OAuth with dynamic client registration, which Claude Code does not currently support. Claude Desktop can use it via the CLI's OAuth flow. If you want the remote surface in Claude Code, you'll need a bearer token — see `npx -y @gomission/mcp install-claude --remote --token <bearer>`.
 
 ## Commands
 
-- `/mission` — required `mission_status` first-call + today's answer
-- `/mission today` — reshapes `mission_today` into a compact ship / reply / state / next block
-- `/mission week` — client-side synthesis over open loops, drafts, and receipts (until Mission ships a server-side week tool)
-- `/mission month` — client-side synthesis over `mission_search` sweeps + receipt coverage + drift zones
-- `/mission approve <intent>` — walks a planned action through the Trust Graduation ceremony (`mission_classify` → `request_approval` → `mission_check_approval` → `log_action` → `get_receipt`)
-- `/mission drafts` — `mission_draft_queue`
-- `/mission loops` — `mission_open_loops` with silent-5+-days flag
-- `/mission receipts` — `mission_receipts` coverage + recent evidence, or `--id` for a specific receipt
-- `/mission review <title|ref>` — creates an approval packet via `mission_prepare_approval_packet` or opens one via `mission_open_approval_packet`
-- `/mission install [--wrap|--local|--remote]` — escalate from remote read-only to local enforcement
-- `/mission verify` — confirm boundary is live
-- `/mission doctor` — diagnose install + surface next actions
+Slash commands are namespaced under `mission:`. Type any of:
+
+- `/mission:mission` — required `mission_status` first-call + today's answer
+- `/mission:today` — reshapes `mission_today` into a compact ship / reply / state / next block
+- `/mission:week` — client-side synthesis over open loops, drafts, and receipts (until Mission ships a server-side week tool)
+- `/mission:month` — client-side synthesis over `mission_search` sweeps + receipt coverage + drift zones
+- `/mission:approve <intent>` — walks a planned action through the Trust Graduation ceremony (`mission_classify` → `request_approval` → `mission_check_approval` → `log_action` → `get_receipt`)
+- `/mission:drafts` — `mission_draft_queue`
+- `/mission:loops` — `mission_open_loops` with silent-5+-days flag
+- `/mission:receipts` — `mission_receipts` coverage + recent evidence, or `--id` for a specific receipt
+- `/mission:review <title|ref>` — creates or opens an approval packet
+- `/mission:install [--wrap|--local|--remote]` — escalate the boundary
+- `/mission:verify` — confirm boundary is live
+- `/mission:doctor` — diagnose install + surface next actions
 
 ## Agent
 
-- `mission-executor` — spawned when a run needs to walk a payload through the ceremony without blocking the main session. Also the target of mobile "run on desktop" custom prompts routed via the secure relay.
+- `mission-executor` — walks any planned consequential action through the Trust Graduation ceremony. Used by `/mission:approve` and by the mobile "run on desktop" relay for custom prompts.
 
 ## Skills
 
-- `today-prompt` — generates the Today paragraph, grounded in tasks/calendar/drafts/threads
-- `week-prompt` — generates the Week paragraph + microgoals block
-- `month-prompt` — generates the month-shape + tree + drift zones
-- `custom-run` — rewrites a free-form user instruction into a Mission payload
+- `today-prompt` — reshapes `mission_today` into Ronen's voice
+- `week-prompt` — client-side synthesis over open_loops + draft_queue + receipts + today
+- `month-prompt` — client-side synthesis over search sweeps + receipts + drift
+- `custom-run` — converts a free-form instruction into a Mission-executable intent
 
 ## Trust Graduation
 
-Nothing external happens without approval. The `/mission approve` command walks any planned consequential action through `mission_classify` → `request_approval` → `mission_check_approval` → `log_action` → `get_receipt`. Mission itself does not execute — it gates. The tool that actually performs the work (Gmail, Slack, publish) runs only after `should_proceed = true`. Receipts are the truth. A run with no receipt is a failed run.
+Nothing external happens without approval. Mission does not execute — it gates. The tool that performs the work (Gmail, Slack, publish, etc.) runs only after `mission_check_approval` returns `should_proceed = true`. Receipts are the truth. A run with no receipt is a failed run.
 
 ## Ground rules
 
 - Prompts are grounded in Mission state. If state is unreachable, commands refuse and point at `/mission:doctor` rather than fabricating.
 - Voice on all generated text: short sentences, no em dashes, declarative, concrete.
-- Trust Graduation applies to every dispatch. The ceremony is the product.
+- Trust Graduation applies to every consequential action. The ceremony is the product.
 
 ## Links
 
