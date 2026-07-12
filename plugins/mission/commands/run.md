@@ -16,6 +16,15 @@ Invoked with no argument text (or only `--tab today|week|month`). The last-gener
 
 Invoked with argument text. That text becomes the payload. This is the mobile "run on desktop" surface — the user is directing the executor from a small screen.
 
+## Precondition — dispatch requires local enforcement
+
+`/mission run` calls `mco_run`, which is only exposed by the local Mission MCP server (installed via `/mission install --local` or `--wrap`). The plugin's default remote endpoint is read-only and does not expose `mco_run`.
+
+Before doing anything else, check whether `mcp__gomission__mco_run` is available. If it is not:
+- Refuse cleanly.
+- Tell the user: "Dispatch requires local enforcement. Run `/mission install --local` (or `--wrap` if you have other consequential MCPs), restart Claude Code, then try again."
+- Do not attempt to work around this.
+
 ## Trust Graduation flow
 
 Regardless of mode, do this in order:

@@ -1,6 +1,7 @@
 {
   "gomission": {
-    "command": "npx",
-    "args": ["-y", "@gomission/mcp", "serve"]
+    "type": "http",
+    "url": "https://gomission.io/mcp/"
   }
 }
+

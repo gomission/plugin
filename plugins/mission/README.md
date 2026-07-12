@@ -9,10 +9,20 @@ This plugin gives Claude Code a today/week/month execution surface backed by the
 ```
 /plugin marketplace add gomission/plugin
 /plugin install mission@gomission
-/mission install
 ```
 
-`/mission install` runs `npx -y @gomission/mcp install-claude` and configures the MCP boundary. See install options below.
+Two layers, use one or both:
+
+**Layer 1 — plugin default (auto-installed)**
+The plugin wires `gomission` to the read-only remote MCP at `https://gomission.io/mcp/`. You get status, findings, review, and doctor visibility immediately. No local process. Safe default. `/mission run` will refuse because dispatch is not exposed on the remote surface.
+
+**Layer 2 — local enforcement (opt-in)**
+```
+/mission install --wrap   # or --local
+```
+Adds a local Mission server to your user Claude config with the Trust Graduation approval ceremony and `mco_run` dispatch. Restart Claude Code after.
+
+If you install both layers, you'll see duplicate tools — remove one entry. `/mission doctor` will flag this.
 
 ## Commands
 
