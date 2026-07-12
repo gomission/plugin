@@ -23,8 +23,8 @@ Insert this object into the `plugins` array of `.claude-plugin/marketplace.json`
     "source": "git-subdir",
     "url": "https://github.com/gomission/plugin.git",
     "path": "plugins/mission",
-    "ref": "v0.1.1",
-    "sha": "8118f1aaf1d7bb59320914523929a0112d64ceeb"
+    "ref": "v0.1.3",
+    "sha": "658ec3552f2ccf519326acd12811dcb5fd4c2050"
   },
   "homepage": "https://claude.gomission.io/"
 }
@@ -42,9 +42,9 @@ git checkout -b add-mission-plugin
 # Edit .claude-plugin/marketplace.json — insert the JSON above into plugins[]
 
 git add .claude-plugin/marketplace.json
-git commit -m "Add mission plugin (v0.1.1)"
+git commit -m "Add mission plugin (v0.1.3)"
 git push -u origin add-mission-plugin
-gh pr create --title "Add mission plugin (v0.1.1)" --body "$(cat ../gomission-plugin/docs/anthropic-marketplace-submission.md | awk '/^## 3\. PR body/,/^## 4\./' | sed '1d;$d')"
+gh pr create --title "Add mission plugin (v0.1.3)" --body "$(cat ../gomission-plugin/docs/anthropic-marketplace-submission.md | awk '/^## 3\. PR body/,/^## 4\./' | sed '1d;$d')"
 ```
 
 ---
@@ -81,7 +81,7 @@ The plugin's primary user surface is the today/week/month execution loop — it 
 ## Source
 
 - Repo: https://github.com/gomission/plugin
-- Tag: `v0.1.1` (commit `8118f1a`)
+- Tag: `v0.1.3` (commit `658ec35`)
 - Plugin subdir: `plugins/mission`
 - MCP package: https://www.npmjs.com/package/@gomission/mcp
 - Trust Graduation protocol: https://trustgraduation.org/
