@@ -1,48 +1,51 @@
 ---
 name: week-prompt
-description: "Generate this week's execution paragraph plus the microgoals-moving block. Use when /mission:week is invoked or when the executor needs Week's payload."
+description: "Synthesize the week from Mission's open loops, draft queue, and receipts. There is no server-side mission_week tool yet — this skill aggregates client-side. Use when /mission:week is invoked."
 ---
 
 # Week Prompt
 
-Two artifacts. Return both, separated by a single blank line.
+Three parallel tool calls, one synthesized block. When Mission ships a server-side `mission_week`, replace this skill with a thin wrapper.
 
-## Artifact 1 — The week paragraph
+## Steps
 
-Same voice rules as Today. Shape:
+1. Call in parallel:
+   - `mcp__gomission__mission_open_loops` (limit 10)
+   - `mcp__gomission__mission_draft_queue` (limit 10)
+   - `mcp__gomission__mission_receipts` (limit 10)
+   - `mcp__gomission__mission_today` (limit 3) — for the today anchor
+2. Synthesize into three artifacts, blank line between each:
 
-1. Opening: closes this week. What must land by Friday.
-2. Middle: goals showing no movement — name them and say what week-of-nothing looks like if unchanged.
-3. Closing: the one bet of the week. What Ronen is trading focus for.
+### Artifact 1 — The week paragraph
 
-Grounded in: tasks due this week + microgoals with active work + goals with `movement_last_7_days = 0`.
+4-6 sentences. Structure:
+1. Opening: closes this week. What must land by Friday, drawn from open loops with due-by state + today's ship item.
+2. Middle: coverage. From `mission_receipts`, one sentence on how many recent actions have receipts.
+3. Closing: the one bet of the week. What Ronen is trading focus for, based on the highest-urgency open loop.
 
-## Artifact 2 — Microgoals moving
+### Artifact 2 — Silent 5+ days
 
-One line per active microgoal. Format:
-
+One line per open loop with `last_touch > 5 days`. Format:
 ```
-- <microgoal name> — <status> — last movement <relative time>
+Silent 5+ days: <loop name> (<age>)
 ```
 
-At the end of the block, if any active microgoal has `last_movement > 5 days`, append:
+If no silent loops, write: `No silent loops.`
 
-```
-Silent 5+ days: <name>, <name>
-```
+### Artifact 3 — Approval backlog
 
-Do not omit this line if silent microgoals exist. It is the single highest-leverage signal Week provides that Today cannot.
+One sentence: `<N> drafts waiting; oldest <age>.`
 
 ## Voice rules
 
-Identical to today-prompt. Reread them.
+Same as today-prompt. Reread if you're about to write "leverage."
 
 ## Grounding rules
 
-- Every microgoal listed must exist in state. Do not invent.
-- Do not include microgoals whose parent goal is marked killed or paused.
-- If no microgoals are active, say so in the second artifact: "No active microgoals." That itself is a signal worth surfacing.
+- Every entity named must trace to a tool response.
+- If a tool returned empty, name it explicitly and skip only that artifact.
+- Do not invent silent loops to make the block feel important.
 
 ## Output
 
-Paragraph, blank line, microgoal block. Nothing else.
+Three artifacts, separated by blank lines. Nothing else.

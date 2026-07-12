@@ -1,51 +1,49 @@
 ---
 name: month-prompt
-description: "Generate the month-shape paragraph, the goals/microgoals/tasks tree, and the drift zones block. Use when /mission:month is invoked."
+description: "Synthesize the month from mission_search sweeps + receipt coverage + drift detection. There is no server-side mission_month tool yet. Use when /mission:month is invoked."
 ---
 
 # Month Prompt
 
-Three artifacts. Return in order, separated by blank lines.
+Client-side aggregation until Mission ships a server-side `mission_month`.
 
-## Artifact 1 — Month-shape paragraph
+## Steps
 
-Proposed month-shape. Not authoritative — Ronen rewrites and the rewrite becomes truth.
+1. Call in parallel:
+   - `mcp__gomission__mission_search` with `query: "active this month"`, `limit: 20`
+   - `mcp__gomission__mission_search` with `query: "waiting on decision"`, `limit: 20`
+   - `mcp__gomission__mission_receipts` (limit 20)
+   - `mcp__gomission__mission_open_loops` (limit 20)
+   - `mcp__gomission__mission_draft_queue` (limit 20)
+2. Synthesize three artifacts, blank line between each:
 
-Shape: one paragraph, 4-7 sentences. What the month is *about* if the current goal set stays. Name the goals by their real names. Name the trades: what gets neglected if the current shape holds. End with the one question Ronen should answer to decide whether to reshape.
+### Artifact 1 — Month-shape paragraph
 
-## Artifact 2 — Goals → Microgoals → Tasks tree
+4-7 sentences. Proposed month-shape, not authoritative. Name goals/loops/drafts by their real refs from the search results. End with the one question Ronen should answer to decide whether to reshape.
 
-Compact indented list. Not a table.
+### Artifact 2 — Coverage
 
-```
-<Goal name> — <status> — <last movement>
-  <Microgoal name> — <status> — <last movement>
-    <Task name> — <status> — <due>
-    <Task name> — <status> — <due>
-  <Microgoal name> — <status> — <last movement>
-    ...
-<Goal name> — <status> — <last movement>
-  ...
-```
+One line: `<N> of <M> actions have receipts (<K>%).` Pull from `mission_receipts`.
 
-Times as "3d ago," "yesterday," "today," "in 2d." Never ISO timestamps.
+### Artifact 3 — Drift zones
 
-## Artifact 3 — Drift zones + unassigned time
+One paragraph, three clauses:
+1. Loops with no receipt in 14+ days — name them.
+2. Drafts stuck in queue 7+ days — name them.
+3. Search results with no follow-up receipt — count.
 
-One paragraph. Three clauses:
-
-1. Goals with no active microgoals — name them.
-2. Microgoals with no active tasks — name them.
-3. Calendar blocks (>2 hours) with no assigned work — count and name the days.
-
-If no drift, say "No drift zones this month." Do not pad.
+If no drift, write: `No drift zones this month.`
 
 ## Voice rules
 
-Same as today-prompt. Reread if you're about to write "leverage."
+Same as today-prompt.
 
 ## Grounding rules
 
-- Every named entity must exist in state.
-- Times must be computed from actual state, not guessed.
-- If any state source is unreachable, name which one and skip only that artifact; do not fabricate around it.
+- Times as "3d ago," "yesterday," "in 2d." Never ISO timestamps.
+- Every entity named must trace to a tool response.
+- If a tool errored, name which one; skip only that block; do not fabricate.
+
+## Output
+
+Three artifacts, separated by blank lines. Nothing else.

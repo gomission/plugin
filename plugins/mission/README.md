@@ -26,15 +26,18 @@ If you install both layers, you'll see duplicate tools — remove one entry. `/m
 
 ## Commands
 
-- `/mission` — status + today's prompt
-- `/mission today` — the ~5-8 sentence execution paragraph for today
-- `/mission week` — this week's paragraph + microgoals moving + silent-microgoals flag
-- `/mission month` — proposed month-shape + full goals/microgoals/tasks tree + drift zones
-- `/mission run [prompt]` — dispatch through the Trust Graduation gate (preview → approve → dispatch → receipt)
-- `/mission install [--wrap|--local|--remote]` — configure the MCP boundary
+- `/mission` — required `mission_status` first-call + today's answer
+- `/mission today` — reshapes `mission_today` into a compact ship / reply / state / next block
+- `/mission week` — client-side synthesis over open loops, drafts, and receipts (until Mission ships a server-side week tool)
+- `/mission month` — client-side synthesis over `mission_search` sweeps + receipt coverage + drift zones
+- `/mission approve <intent>` — walks a planned action through the Trust Graduation ceremony (`mission_classify` → `request_approval` → `mission_check_approval` → `log_action` → `get_receipt`)
+- `/mission drafts` — `mission_draft_queue`
+- `/mission loops` — `mission_open_loops` with silent-5+-days flag
+- `/mission receipts` — `mission_receipts` coverage + recent evidence, or `--id` for a specific receipt
+- `/mission review <title|ref>` — creates an approval packet via `mission_prepare_approval_packet` or opens one via `mission_open_approval_packet`
+- `/mission install [--wrap|--local|--remote]` — escalate from remote read-only to local enforcement
 - `/mission verify` — confirm boundary is live
 - `/mission doctor` — diagnose install + surface next actions
-- `/mission review` — pending approvals, recent receipts, older findings
 
 ## Agent
 
@@ -49,7 +52,7 @@ If you install both layers, you'll see duplicate tools — remove one entry. `/m
 
 ## Trust Graduation
 
-Nothing runs without approval. `/mission run` always previews action classes and predicted receipts before dispatch. External writes raise per-action approval cards mid-run. Receipts are the truth — a run with no receipt is a failed run.
+Nothing external happens without approval. The `/mission approve` command walks any planned consequential action through `mission_classify` → `request_approval` → `mission_check_approval` → `log_action` → `get_receipt`. Mission itself does not execute — it gates. The tool that actually performs the work (Gmail, Slack, publish) runs only after `should_proceed = true`. Receipts are the truth. A run with no receipt is a failed run.
 
 ## Ground rules
 

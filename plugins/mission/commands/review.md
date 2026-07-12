@@ -1,20 +1,23 @@
 ---
-description: "Review pending Mission findings and receipts"
-argument-hint: "[--since DATE] [--class ACTION_CLASS]"
-allowed-tools: ["mcp__gomission__mco_review", "mcp__gomission__mco_findings_list"]
+description: "Prepare or open an approval packet for human review"
+argument-hint: "<title or source_ref> [--purpose TEXT] [--recommendation TEXT]"
+allowed-tools: ["mcp__gomission__mission_status", "mcp__gomission__mission_prepare_approval_packet", "mcp__gomission__mission_open_approval_packet"]
 ---
 
 # /mission review
 
-Show what Mission has recorded — findings, receipts, pending approvals.
+Prepare a local Mission approval packet for a review — a workspace artifact + waiting receipt. This never sends, posts, or submits.
 
 ## Steps
 
-1. Call `mcp__gomission__mco_findings_list` with the filters from `$ARGUMENTS`.
-2. If findings exist, group by action class. For each class show: count, oldest pending, top 3 most recent.
-3. Call `mcp__gomission__mco_review` for the current session's proposed actions.
-4. Present in this order: pending approvals first (loudest), recent receipts second, older findings last.
+1. Call `mission_status` if not yet called this session.
+2. Parse `$ARGUMENTS`:
+   - If it starts with a Mission ref (`task:*`, `draft:*`, `packet:*`, `receipt:*`), pass as `source_ref` to `mission_open_approval_packet`.
+   - Otherwise treat the argument text as `title` and require `--purpose` and `--recommendation` flags; call `mission_prepare_approval_packet`.
+3. Return the packet reference and a one-line summary.
+4. Tell the user: "Open the packet to decide. `/mission approve` will not proceed until a human decision is recorded."
 
-## Voice
+## Ground rules
 
-This is an evidence surface. State what Mission actually recorded. Do not summarize what "probably happened" — either the receipt exists or it doesn't.
+- This command creates local review artifacts only. It does not execute the action being reviewed.
+- If the user gave a title without `--purpose`, ask for the purpose in one sentence. Do not guess.

@@ -1,27 +1,34 @@
 ---
-description: "Today's prompt — the ~5-8 sentence execution paragraph"
-argument-hint: "[--edit] [--run]"
+description: "Today's Mission answer — three priorities, proof loop, drafts, receipts, next step"
+argument-hint: "[--limit N]"
+allowed-tools: ["mcp__gomission__mission_status", "mcp__gomission__mission_today"]
 ---
 
 # /mission today
 
-Generate today's prompt. The prompt is the executable payload — running it dispatches through the Mission Trust Graduation gate.
+Render Mission's daily answer.
 
 ## Steps
 
-1. Invoke the `today-prompt` skill to produce the paragraph.
-2. Present the paragraph as-is (no headers, no bullet reformatting — Ronen wants prose he can read like a note to himself).
-3. Below the paragraph, show four affordances on separate lines:
-   - `[Run]` → user types `/mission:run` (executes deterministic subset, cards up external writes)
-   - `[Edit]` → user replies with an edited version; the edit is captured as training signal (weight 1x per voice signal hierarchy)
-   - `[Show week]` → user types `/mission:week`
-   - `[Show month]` → user types `/mission:month`
+1. Call `mcp__gomission__mission_status` if it hasn't been called this session; obey `agent_instructions`.
+2. Call `mcp__gomission__mission_today` with the limit from `$ARGUMENTS` (default 3).
+3. Reshape the response into a single readable block in Ronen's voice. Structure:
+   - **Ship** — the top-priority action or draft to move today. One or two sentences.
+   - **Reply** — the Gmail proof loop (if any).
+   - **State** — draft queue count, voice confidence, receipt/learning status. One sentence.
+   - **Next** — the one next step Mission recommends.
+4. End with two affordances on one line: `/mission approve  /mission drafts`.
 
-## Modifiers
+## Voice rules (strict)
 
-- `--edit` — Skip generation. Present the last generated Today prompt in an editable form; capture the user's rewrite as a training pair.
-- `--run` — Generate, then immediately dispatch through `/mission:run`. Only permitted when Autonomy mode is set for the Today tab in Mission's trust tier config; otherwise refuse and explain.
+- Short sentences.
+- No em dashes. Use hyphens, commas, or periods.
+- No art-speak. No "leverage," no "unlock," no "align."
+- Declarative. No hedges.
+- Concrete. Name the person, the draft, the loop by their real name if the tool returned it. Never "the client."
 
-## Voice
+## Grounding rules
 
-Short sentences. No em dashes. No art-speak. Declarative. Concrete. If the paragraph contains vague phrasing ("work on X," "look at Y"), rewrite before presenting.
+- Every sentence must trace to the tool's response. If `mission_today` returned no proof loop, do not write about a proof loop.
+- If Mission's response is empty or thin, produce a shorter block. Do not pad.
+- If the tool errors, refuse and tell the user to run `/mission:doctor`.
