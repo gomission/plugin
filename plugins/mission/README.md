@@ -13,6 +13,10 @@ This plugin gives Claude Code a today/week/month execution surface backed by the
 
 The plugin wires `gomission` to a local Mission MCP server via `npx -y @gomission/mcp serve`. That's the default because it works out of the box — no auth handshake required.
 
+Commands are **surface-agnostic** — they try the structured Mission tool first (`mission_today`, `mission_open_loops`, etc.) and fall back to `mission_ask` (natural-language proxy to the local Mission web instance) when the structured tool isn't exposed. Local serve exposes only `mission_ask` + the four gate tools; the hosted remote endpoint exposes the full structured surface. Either works.
+
+**Note on `mission_ask`:** it proxies to a local Mission web instance on `http://127.0.0.1:8814`. Start it with `mission web 8814` in a separate terminal. If the web instance isn't running, `mission_ask` returns a clear error and the plugin surfaces it verbatim.
+
 **Optional: opt into wrap enforcement**
 
 If you also have other consequential MCP servers (Gmail, Slack, etc.), run:

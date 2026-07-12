@@ -1,21 +1,16 @@
 ---
 description: "Drafts and approval packets waiting for review"
 argument-hint: "[--limit N]"
-allowed-tools: ["mcp__gomission__mission_status", "mcp__gomission__mission_draft_queue"]
 ---
 
 # /mission drafts
 
-Show local drafts and approval packets awaiting human review.
-
 ## Steps
 
 1. Call `mission_status` if not yet called this session.
-2. Call `mcp__gomission__mission_draft_queue` with the limit from `$ARGUMENTS` (default 10).
-3. Render one line per draft: `<title> — <status> — <age>`. Age as relative time.
-4. If a draft has an approval packet ready, mark it: `[packet ready]`.
-5. End with: `Approve one: /mission approve <intent>`.
-
-## Voice
-
-Prose over table. Compact. No headers.
+2. Dispatch:
+   - If `mcp__gomission__mission_draft_queue` is available, call it with the limit (default 10).
+   - Else if `mcp__gomission__mission_ask` is available, call `query: "List my local drafts and approval packets waiting for review. For each: title, status, age, and whether a packet is ready."`
+   - Else refuse.
+3. Render one line per draft: `<title> — <status> — <age>`. Mark packet-ready drafts with `[packet ready]`.
+4. End with: `Approve one: /mission:approve <intent>`

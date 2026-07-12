@@ -1,35 +1,29 @@
 ---
-description: "This month's shape — search across Mission state, receipt coverage, drift zones"
+description: "This month's shape — coverage, drift zones, month-shape paragraph"
 argument-hint: "[--reshape]"
-allowed-tools: ["mcp__gomission__mission_status", "mcp__gomission__mission_search", "mcp__gomission__mission_receipts", "mcp__gomission__mission_open_loops", "mcp__gomission__mission_draft_queue"]
 ---
 
 # /mission month
 
-There is no server-side `mission_month` tool. This command synthesizes from `mission_search` sweeps and receipt coverage. Will move server-side when Mission ships it.
+Surface-agnostic.
 
 ## Steps
 
 1. Call `mission_status` if not yet called this session.
-2. Call `mission_search` twice with month-scale queries: `"active this month"` and `"waiting on decision"`. Limit 20 each.
-3. Call `mission_receipts` (limit 20) — receipt coverage.
-4. Call `mission_open_loops` (limit 20) and `mission_draft_queue` (limit 20).
-5. Present three blocks:
-   - **Month-shape paragraph** — 4-7 sentences. What this month is about based on the search + loops + receipts. Name goals/loops/drafts by their real refs. End with the one question Ronen should answer to decide whether to reshape.
-   - **Coverage** — receipt coverage percentage + count of actions taken with receipts vs without. From `mission_receipts`.
-   - **Drift zones** — one paragraph: loops with no receipt in 14+ days; drafts stuck in queue 7+ days; search results with no follow-up receipt.
-6. Affordances: `/mission approve  /mission loops  /mission receipts`.
+2. Dispatch:
+   - **Structured** (if `mcp__gomission__mission_search` is available):
+     - Parallel: `mission_search "active this month"` (20), `mission_search "waiting on decision"` (20), `mission_receipts` (20), `mission_open_loops` (20), `mission_draft_queue` (20).
+     - Synthesize client-side.
+   - **Ask** (else if `mcp__gomission__mission_ask` is available):
+     - `query: "Give me this month's shape: 4-7 sentences on what the month is about, receipt coverage as N of M actions (K%), and drift zones — loops with no receipt in 14+ days, drafts stuck 7+ days, search results with no follow-up receipt. End with the one question I should answer to decide whether to reshape."`
+   - Else refuse.
+3. Present three blocks: month-shape paragraph, coverage line, drift zones paragraph.
+4. Affordances: `/mission:approve  /mission:loops  /mission:receipts`
 
-## Modifiers
+## Modifier
 
-- `--reshape` — Skip generation. Take the user's next message as the new authoritative month-shape and echo it back for confirmation.
+- `--reshape` — Take the user's next message as the new month-shape; echo back for confirmation.
 
-## Voice rules
+## Voice + grounding
 
-Same as today.md.
-
-## Grounding rules
-
-- Times as "3d ago," "yesterday," "in 2d." Never ISO timestamps.
-- Every entity named must trace to a tool response.
-- If any tool returns empty, name which one and skip only that block. Do not fabricate around it.
+Same rules. Times as "3d ago," never ISO timestamps.

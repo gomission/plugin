@@ -1,23 +1,16 @@
 ---
 description: "Open loops — unresolved relationships and promises"
 argument-hint: "[--limit N]"
-allowed-tools: ["mcp__gomission__mission_status", "mcp__gomission__mission_open_loops"]
 ---
 
 # /mission loops
 
-Show unresolved relationship loops and promises needing review.
-
 ## Steps
 
 1. Call `mission_status` if not yet called this session.
-2. Call `mcp__gomission__mission_open_loops` with the limit from `$ARGUMENTS` (default 10).
-3. Group into two blocks:
-   - **Waiting on you** — loops where the next action is Ronen's.
-   - **Waiting on them** — loops where the next action is external, plus how long since last touch.
-4. Flag any loop with `last_touch > 5 days` at the top: `Silent 5+ days: <name>`. Do not omit if any exist.
-5. End with affordances: `/mission approve <intent>  /mission drafts`.
-
-## Grounding
-
-Every loop named must trace to a tool response. If the tool returns empty, say "No open loops." That itself is a signal.
+2. Dispatch:
+   - If `mcp__gomission__mission_open_loops` is available, call with the limit (default 10).
+   - Else if `mcp__gomission__mission_ask` is available, call `query: "List my open loops — unresolved relationships and promises needing review. Split into waiting-on-me and waiting-on-them. Flag any with no touch in 5+ days."`
+   - Else refuse.
+3. Two blocks: **Waiting on you** and **Waiting on them** (with time-since-last-touch). At top, flag silent 5+ day loops: `Silent 5+ days: <name>`. Do not omit if any exist.
+4. Affordances: `/mission:approve  /mission:drafts`
