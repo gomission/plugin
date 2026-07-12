@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "gomission",
+  "description": "Official Mission plugins for Claude Code. Mission is the Trust Graduation gate for agentic work — Claude prepares real work, Mission decides what Claude is allowed to do by action class, evidence, approval, and receipt.",
+  "owner": {
+    "name": "Mission",
+    "email": "support@gomission.io"
+  },
+  "plugins": [
+    {
+      "name": "mission",
+      "description": "Turn Claude Code into an execution surface for your day. /mission today, /mission week, /mission month generate the actual prompts that run your work through the Mission Trust Graduation gate.",
+      "author": {
+        "name": "Mission",
+        "email": "support@gomission.io"
+      },
+      "category": "productivity",
+      "source": "./plugins/mission",
+      "homepage": "https://claude.gomission.io/"
+    }
+  ]
+}

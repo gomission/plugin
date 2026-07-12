@@ -1,0 +1,6 @@
+{
+  "gomission": {
+    "command": "npx",
+    "args": ["-y", "@gomission/mcp", "serve"]
+  }
+}
